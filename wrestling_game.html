@@ -50,22 +50,39 @@
   <input type="text" id="userInput" placeholder="Enter your move">
 
   <script>
-    const playerMoves = ["Body Slam", "Suplex", "Drop Kick", "Armbar", "Power Bomb"];
-    const opponentMoves = ["Chokeslam", "DDT", "Spear", "Hurricanrana", "German Suplex"];
-    
-    const moveValues = {
-      "Body Slam": 10,
-      "Suplex": 15,
-      "Drop Kick": 8,
-      "Armbar": 5,
-      "Power Bomb": 20,
-      "Chokeslam": 12,
-      "DDT": 18,
-      "Spear": 25,
-      "Hurricanrana": 14,
-      "German Suplex": 16
+    const moves = {
+      Holds: {
+        "Armbar": 5,
+        "Full Nelson": 4
+      },
+      Throws: {
+        "Body Slam": 10,
+        "Suplex": 15,
+        "Power Bomb": 20
+      },
+      Strikes: {
+        "Drop Kick": 8,
+        "Punch": 4,
+        "Kick": 6
+      },
+      Aerials: {
+        "Hurricanrana": 14,
+        "Moonsault": 15
+      },
+      Taunts: {
+        "Taunt": 0
+      }
     };
-    
+	
+	
+	const moveValues = {};
+for (const category in moves) {
+  for (const move in moves[category]) {
+    moveValues[move.toLowerCase()] = moves[category][move];
+  }
+}
+
+
     let playerScore = 0;
     let enemyScore = 0;
     let turnIndex = 0;
@@ -77,24 +94,28 @@
       outputDiv.innerText += text + '\n';
       outputDiv.scrollTop = outputDiv.scrollHeight;
     }
-    
+
+
+
     document.getElementById('userInput').addEventListener('keydown', function (event) {
       if (event.key === 'Enter') {
-        const playerInput = event.target.value.trim();
+        const playerInput = event.target.value.trim().toLowerCase();
         event.target.value = '';
 
-        if (!moveValues.hasOwnProperty(playerInput)) {
+        // Validate player input
+        if (!(playerInput in moveValues)) {
           logOutput("INVALID MOVE. TRY AGAIN.");
           return;
         }
 
-        const opponentMove = opponentMoves[Math.floor(Math.random() * opponentMoves.length)];
-        const playerValue = moveValues[playerInput];
-        const opponentValue = moveValues[opponentMove];
+        // Randomly select an opponent move
+       const playerValue = moveValues[playerInput];
+	   const opponentMove = Object.keys(moveValues)[Math.floor(Math.random() * Object.keys(moveValues).length)];
+	   const opponentValue = moveValues[opponentMove];
 
-        logOutput(`\nTURN ${turnIndex + 1}`);
-        logOutput(`YOU: ${playerInput} (${playerValue})`);
-        logOutput(`OPPONENT: ${opponentMove} (${opponentValue})`);
+        // Log output for this turn
+        logOutput(`YOU: ${playerInput.toUpperCase()} (${playerValue})`);
+        logOutput(`OPPONENT: ${opponentMove.toUpperCase()} (${opponentValue})`);
 
         if (playerValue > opponentValue) {
           logOutput("*** YOU WIN THIS TURN! ***");
