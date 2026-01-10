@@ -296,7 +296,7 @@
 		"Rope-Aided Hurricanrana": 1, 
 		"Hip Toss": 1, 
 		"Iconoclams": -1, 
-		"Irish Whip" 1, 
+		"Irish Whip": 1, 
 		"Jawbreaker": -1,
 		"Shoulder Jawbreaker": 0, 
 		"Sitout Jawbreaker": -1,
@@ -569,8 +569,14 @@ for (const category in moves) {
 
         // Randomly select an opponent move
        const playerValue = moveValues[playerInput];
-	   const opponentMove = Object.keys(moveValues)[Math.floor(Math.random() * Object.keys(moveValues).length)];
-	   const opponentValue = moveValues[opponentMove];
+	   const keys = Object.keys(moveValues);
+	   let opponentMove, opponentValue;
+	   do { 
+		opponentMove = keys[Math.floor(Math.random()* keys.length)];
+		opponentValue = moveValues[opponentMove];
+	   } while (opponentValue === playerValue && keys.length > 1);
+	   
+
 
         // Log output for this turn
         logOutput(`YOU: ${playerInput.toUpperCase()} (${playerValue})`);
@@ -582,8 +588,6 @@ for (const category in moves) {
         } else if (playerValue < opponentValue) {
           logOutput("*** OPPONENT WINS THIS TURN! ***");
           enemyScore++;
-        } else {
-          logOutput("*** IT'S A TIE! ***");
         }
 
         logOutput(`Score: Player ${playerScore} - Enemy ${enemyScore}`);
