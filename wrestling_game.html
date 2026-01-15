@@ -46,10 +46,17 @@
 </head>
 <body>
   <h1>Wrestling Adventure Game</h1>
-  <div id="output">*** READY FOR COMBAT ***</div>
-  <input type="text" id="userInput" placeholder="Enter your move">
+  <div id="output"></div>
+  <input type="text" id="userInput" placeholder="Enter your move" disabled>
+  <button id="startBtn">OK</button> 
+  <audio id="introSound" src="8bit-ring.mp3"></audio>
+
+  
 
   <script>
+	let gameState = "intro";
+	let pendingOpponentMove = null; 
+	let pendingOpponentValue = null; 
     const moves = {
 	Holds: {
     "Camel Clutch": 1,
@@ -553,10 +560,31 @@ for (const category in moves) {
       outputDiv.innerText += text + '\n';
       outputDiv.scrollTop = outputDiv.scrollHeight;
     }
-
-
+	
+	window.onload = () => {
+	logOutput("WELCOME TO THE HTML WRESTLING ADVENTURE GAME");
+	logOutput("TYPE THE NAME OF A HOLD, THROW, OR STRIKE AND PRESS ENTER");
+	logOutput("");
+	logOutput("CLICK OK TO BEGIN");
+	
+	document.getElementById("introSound").play().catch(() => {});
+	};
+	
+	document.getElementById("startBtn").onclick = () => {
+		gameState = "playing";
+		outputDiv.innerText = " *** GET READY ***";
+		const keys = Object.keys(moveValues);
+		pendingOpponentMove = keys[Math.floor(Math.random() * keys.length)];
+		pendingOpponentValue = moveValues[pendingOpponentMove];
+		
+		logOutput(`\nOPPONENT USES: ${pendingOpponentMove.toUpperCase()}`);
+		
+		document.getElementById("userInput").disabled = false; 
+		document.getElementById("startBtn").remove();
+	};
 
     document.getElementById('userInput').addEventListener('keydown', function (event) {
+	  if (gameState !== "playing") return; 
       if (event.key === 'Enter') {
         const playerInput = event.target.value.trim().toLowerCase();
         event.target.value = '';
@@ -569,12 +597,8 @@ for (const category in moves) {
 
         // Randomly select an opponent move
        const playerValue = moveValues[playerInput];
-	   const keys = Object.keys(moveValues);
-	   let opponentMove, opponentValue;
-	   do { 
-		opponentMove = keys[Math.floor(Math.random()* keys.length)];
-		opponentValue = moveValues[opponentMove];
-	   } while (opponentValue === playerValue && keys.length > 1);
+	   const opponentMove = pendingOpponentMove;
+	   const opponentValue = pendingOpponentValue;
 	   
 
 
@@ -593,9 +617,15 @@ for (const category in moves) {
         logOutput(`Score: Player ${playerScore} - Enemy ${enemyScore}`);
 
         turnIndex++;
+		const keys = Object.keys(moveValues);
+		pendingOpponentMove = keys[Math.floor(Math.random() * keys.length)];
+		pendingOpponentValue = moveValues[pendingOpponentMove];
+		
+		logOutput(`\nOPPONENT USES: ${pendingOpponentMove.toUpperCase()}`);
         if (turnIndex >= MAX_TURNS) {
+			document.getElementById("userInput").disabled = true;
           logOutput("\n>>> GAME OVER <<<");
-          logOutput(`FINAL SCORE: Player ${playerScore} - Enemy ${enemyScore}`);  
+      
         }
       }
     });
